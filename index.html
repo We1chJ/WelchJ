@@ -456,7 +456,7 @@
             clear: 0.74   // fraction of radius that stays undistorted (readable centre)
         };
 
-        let selecting = false, lensShown = false, rafQueued = false, pending = null;
+        let selecting = false, lensShown = false;
 
         function setupLens() {
             lensCanvas.width = Math.round(LENS_D * dpr);
@@ -553,11 +553,7 @@
                 return;
             }
             showLens();
-            pending = { x: e.clientX, y: e.clientY };
-            if (!rafQueued) {
-                rafQueued = true;
-                requestAnimationFrame(() => { rafQueued = false; if (pending) drawLens(pending.x, pending.y); });
-            }
+            drawLens(e.clientX, e.clientY);   // update position + zoom immediately (no frame lag)
         }
 
         window.addEventListener("mousemove", onMove);
