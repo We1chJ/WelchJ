@@ -527,11 +527,17 @@
             const sx = (cx - fit.x) * s, sy = (cy - fit.y) * s;
 
             lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            lctx.clearRect(0, 0, LENS_D, LENS_D);       // transparent corners
+            lctx.save();
+            lctx.beginPath();                            // clip the glass surface to a circle
+            lctx.arc(LENS_D / 2, LENS_D / 2, LENS_D / 2, 0, Math.PI * 2);
+            lctx.clip();
             lctx.fillStyle = "#fff";
             lctx.fillRect(0, 0, LENS_D, LENS_D);
             lctx.drawImage(source,
                 sx - cropSrc / 2, sy - cropSrc / 2, cropSrc, cropSrc,
                 0, 0, LENS_D, LENS_D);
+            lctx.restore();
 
             lens.style.left = (cx - LENS_D / 2) + "px";
             lens.style.top = (cy - LENS_D / 2) + "px";
