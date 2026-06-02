@@ -76,6 +76,7 @@
             inset: 0;
             border-radius: 50%;
             overflow: hidden;
+            background: #fff;       /* paper backing so the page never bleeds through */
             z-index: 3;
         }
 
@@ -450,9 +451,9 @@
         // Glass refraction parameters. distortionScale drives the radial edge
         // bend; the R/G/B offsets give chromatic aberration at the rim.
         const GLASS = {
-            displace: 0.4, distortionScale: -95,
-            redOffset: 0, greenOffset: 7, blueOffset: 14,
-            clear: 0.6   // fraction of radius that stays undistorted (readable centre)
+            displace: 0.4, distortionScale: -38,
+            redOffset: 0, greenOffset: 4, blueOffset: 8,
+            clear: 0.74   // fraction of radius that stays undistorted (readable centre)
         };
 
         let selecting = false, lensShown = false, rafQueued = false, pending = null;
