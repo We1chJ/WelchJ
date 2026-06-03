@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import FluidLens from './FluidLens';
+import FluidLens, { MagnifierFrame } from './FluidLens';
 import { initResume } from './resume';
 
 export default function App() {
@@ -14,8 +14,9 @@ export default function App() {
         <div id="textLayer" className="textLayer" />
       </div>
 
-      {/* WebGL glass lens overlay (pointer-events:none) */}
+      {/* WebGL glass lens overlay (pointer-events:none) + its brass frame */}
       <FluidLens />
+      <MagnifierFrame />
 
       <button id="crumpleBtn" disabled>Crumple &amp; toss ↘</button>
 
