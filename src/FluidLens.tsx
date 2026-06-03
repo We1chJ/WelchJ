@@ -103,10 +103,10 @@ function Lens() {
           buffer={buffer.texture}
           transmission={1}
           roughness={0}
-          ior={1.32}
-          thickness={4}
+          ior={1.2}
+          thickness={2.6}
           anisotropy={0}
-          chromaticAberration={0.06}
+          chromaticAberration={0.04}
         />
       </mesh>
     </>
