@@ -25,6 +25,11 @@
             z-index: 1;
         }
 
+        /* Hide the native cursor while the magnifier is active over the resume */
+        body.lens-on {
+            cursor: none;
+        }
+
         /* Overlay holding the selectable text, positioned over the page. */
         #docLayer {
             position: fixed;
@@ -448,6 +453,7 @@
         // ---- Glass magnifier lens (GlassSurface technique, vanilla port) ----
         const LENS_D = 260;     // lens diameter (CSS px)
         const LENS_ZOOM = 2.1;  // magnification factor
+        const LENS_DX = -55, LENS_DY = -55;  // glass sits up-left of the pointer
         // Glass refraction parameters. distortionScale drives the radial edge
         // bend; the R/G/B offsets give chromatic aberration at the rim.
         const GLASS = {
@@ -544,8 +550,12 @@
             lens.style.top = (cy - LENS_D / 2) + "px";
         }
 
-        function showLens() { if (!lensShown) { lensShown = true; lens.classList.add("show"); } }
-        function hideLens() { if (lensShown) { lensShown = false; lens.classList.remove("show"); } }
+        function showLens() {
+            if (!lensShown) { lensShown = true; lens.classList.add("show"); document.body.classList.add("lens-on"); }
+        }
+        function hideLens() {
+            if (lensShown) { lensShown = false; lens.classList.remove("show"); document.body.classList.remove("lens-on"); }
+        }
 
         function onMove(e) {
             if (animState !== "idle" || !fit || selecting || !nearPage(e.clientX, e.clientY)) {
@@ -553,7 +563,8 @@
                 return;
             }
             showLens();
-            drawLens(e.clientX, e.clientY);   // update position + zoom immediately (no frame lag)
+            // Glass floats up-left of the pointer and magnifies what's under the glass.
+            drawLens(e.clientX + LENS_DX, e.clientY + LENS_DY);
         }
 
         window.addEventListener("mousemove", onMove);
