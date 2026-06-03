@@ -10,12 +10,19 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 export type AnimState = 'idle' | 'running' | 'gone';
 export interface Fit { x: number; y: number; w: number; h: number; }
 
-// Shared, read by FluidLens each frame.
+// Shared, read by the paper cloth + glass lens each frame.
 export const resumeState: {
-  stage: HTMLCanvasElement | null;
+  stage: HTMLCanvasElement | null;   // 2D canvas used for the crumple/toss anim
+  source: HTMLCanvasElement | null;  // rendered PDF bitmap (cloth texture source)
+  clothCanvas: HTMLCanvasElement | null; // WebGL paper canvas (lens texture source)
   fit: Fit | null;
   animState: AnimState;
-} = { stage: null, fit: null, animState: 'idle' };
+  dragging: boolean;                 // true while the user is dragging the paper
+  lensEnabled: boolean;              // magnifier on/off (toggle button)
+} = {
+  stage: null, source: null, clothCanvas: null, fit: null,
+  animState: 'idle', dragging: false, lensEnabled: true
+};
 
 let started = false;
 
@@ -301,6 +308,7 @@ export function initResume(): void {
       resumeState.animState = 'gone';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      stage.style.display = 'none';
       trashEl.classList.remove('shake');
       void trashEl.offsetWidth;
       trashEl.classList.add('shake');
@@ -311,6 +319,7 @@ export function initResume(): void {
   function startCrumple() {
     if (resumeState.animState !== 'idle' || !source) return;
     docLayer.style.display = 'none';  // text layer can't crumple
+    stage.style.display = 'block';    // hand off from the cloth to the 2D anim
     mesh = buildMesh();
     resumeState.animState = 'running';
     animStart = performance.now();
@@ -324,6 +333,7 @@ export function initResume(): void {
     hintEl.classList.remove('show');
     btn.disabled = false;
     docLayer.style.display = 'block';
+    stage.style.display = 'none';     // hand display back to the cloth
     drawStatic();
   }
 
@@ -365,11 +375,13 @@ export function initResume(): void {
       sctx.fillStyle = '#fff';
       sctx.fillRect(0, 0, source.width, source.height);
       await pdfPage.render({ canvasContext: sctx, viewport }).promise;
+      resumeState.source = source;
 
       document.getElementById('loading')?.remove();
       computeFit();
       placeDocLayer();
       drawStatic();
+      stage.style.display = 'none';     // the cloth is the resting display
       await buildTextLayer();
       btn.disabled = false;
     } catch (err: any) {

@@ -1,14 +1,25 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import FluidLens, { MagnifierFrame } from './FluidLens';
-import { initResume } from './resume';
+import PaperCloth from './PaperCloth';
+import { initResume, resumeState } from './resume';
 
 export default function App() {
   useEffect(() => { initResume(); }, []);
+
+  const [lensOn, setLensOn] = useState(resumeState.lensEnabled);
+  const toggleLens = () => {
+    const next = !resumeState.lensEnabled;
+    resumeState.lensEnabled = next;
+    setLensOn(next);
+  };
 
   return (
     <>
       <div id="loading">Loading resume…</div>
       <canvas id="stage" />
+
+      {/* Interactive paper (resting display); 2D #stage handles crumple/toss */}
+      <PaperCloth />
 
       <div id="docLayer">
         <div id="textLayer" className="textLayer" />
@@ -17,6 +28,15 @@ export default function App() {
       {/* WebGL glass lens overlay (pointer-events:none) + its brass frame */}
       <FluidLens />
       <MagnifierFrame />
+
+      <button
+        id="lensToggleBtn"
+        className={lensOn ? 'on' : ''}
+        onClick={toggleLens}
+        title="Toggle the magnifier"
+      >
+        🔍 Magnifier: {lensOn ? 'On' : 'Off'}
+      </button>
 
       <button id="crumpleBtn" disabled>Crumple &amp; toss ↘</button>
 

@@ -59,7 +59,7 @@ function Lens() {
 
   useFrame((state, delta) => {
     const { gl, camera } = state;
-    const stage = resumeState.stage;
+    const stage = resumeState.clothCanvas;
 
     // Lazily create the resume texture once the canvas exists.
     if (stage && !texRef.current) {
@@ -81,7 +81,9 @@ function Lens() {
     }
 
     const show =
-      !!stage && !!texRef.current && pointer.current.over && resumeState.animState === 'idle';
+      resumeState.lensEnabled &&
+      !!stage && !!texRef.current && pointer.current.over &&
+      resumeState.animState === 'idle' && !resumeState.dragging;
 
     // Hide the system cursor only while the glass stands in for it.
     document.body.classList.toggle('lens-active', show);
